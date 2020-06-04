@@ -78,6 +78,7 @@ services:
       - ./xnat/server.xml:/usr/local/tomcat/conf/server.xml:ro
       - ./xnat-data/plugins:/data/xnat/home/plugins:ro
       - ./xnat-data/webapps:/usr/local/tomcat/webapps
+      - ./xnat-data/tomcat:/usr/local/tomcat/logs
       - /var/run/docker.sock:/var/run/docker.sock
       - type: bind
         source: /opt/data/archive
@@ -90,6 +91,7 @@ services:
         target: /data/xnat/home/logs
     environment:
       - CATALINA_OPTS=-Xms128m -Xmx8192m -Dxnat.home=/data/xnat/home -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000
+      - PGPASSWORD="${XNAT_DATASOURCE_PASSWORD}"
       - XNAT_HOME=/data/xnat/home
     networks:
       - xnat_swarm
@@ -108,7 +110,6 @@ services:
       replicas: 1
       labels:
         - traefik.http.services.xnat-db.loadbalancer.server.port=5432
-
     networks:
       - xnat_swarm
 
@@ -138,7 +139,9 @@ services:
       - ./orthanc/orthanc.json:/etc/orthanc/orthanc.json:ro
     networks:
       - xnat_swarm
-
+    environment:
+      - PGPASSWORD="${XNAT_DATASOURCE_PASSWORD}"
+                  
 networks:
   xnat_swarm:
     external: true

@@ -6,7 +6,7 @@ docker service create --name registry --publish published=5000,target=5000 regis
 docker-compose -f docker-compose-stack.yml build
 docker-compose -f docker-compose-stack.yml push
 # Create local directories for bind mount targets
-mkdir -m755 {./xnat-data,./xnat-data/archive,./xnat-data/build,./xnat-data/logs}
+mkdir -m755 {./xnat-data,./xnat-data/logs}
 mkdir -m755 postgres-data
 mkdir -m755 orthanc-data
 mkdir -m755 traefik-data
