@@ -7,7 +7,7 @@ services:
     image: traefik:2.2
     command:
       - --entrypoints.web.address=:80
- #     - --api.insecure # Don't do that in production
+      - --api.insecure # Don't do that in production
       - --providers.docker=true
       - --providers.docker.network=xnat_swarm
       - --providers.docker.swarmMode=true
@@ -74,6 +74,8 @@ services:
         - traefik.http.routers.xnat-web.rule=PathPrefix(`/`)
         - traefik.http.services.xnat-web.loadbalancer.server.port=8080
         - traefik.http.routers.xnat-web.entrypoints=web
+      placement:
+        constraints: [node.role == manager]
     volumes:
       - ./xnat/server.xml:/usr/local/tomcat/conf/server.xml:ro
       - ./xnat-data/plugins:/data/xnat/home/plugins:ro
@@ -108,6 +110,8 @@ services:
       replicas: 1
       labels:
         - traefik.http.services.xnat-db.loadbalancer.server.port=5432
+      placement:
+        constraints: [node.role == manager]
 
     networks:
       - xnat_swarm
@@ -133,6 +137,8 @@ services:
         - traefik.http.routers.orthanc.rule=PathPrefix(`/pacs`)
         - traefik.http.routers.orthanc.middlewares=orthanc-stripprefix@docker 
         - traefik.http.services.orthanc.loadbalancer.server.port=8042
+      placement:
+        constraints: [node.role == manager]
     volumes:
       - ./orthanc-data:/var/lib/orthanc/db
       - ./orthanc/orthanc.json:/etc/orthanc/orthanc.json:ro
